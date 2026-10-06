@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">DIGITAL MENU</p><h1>Today's Menu</h1></div><a class="btn outline" href="{{ url_for('cart') }}">🛒 View Cart</a></div>
+<div class="menu-grid">
+{% for item in items %}
+  <article class="food-card">
+    <div class="food-icon">🍽️</div>
+    <h3>{{ item.name }}</h3>
+    <p>{{ item.description }}</p>
+    <div class="food-bottom"><strong>₹{{ '%.2f'|format(item.price) }}</strong>
+      <form method="post" action="{{ url_for('add_to_cart', item_id=item.id) }}"><button class="btn small">Add</button></form>
+    </div>
+  </article>
+{% else %}
+  <p>No food items are currently available.</p>
+{% endfor %}
+</div>
+{% endblock %}

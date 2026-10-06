@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="success-card">
+  <div class="success-icon">✓</div>
+  <p class="eyebrow">ORDER CONFIRMED</p>
+  <h1>Your order is placed!</h1>
+  <p>Show this order/parcel code when collecting your food.</p>
+  <div class="order-code">{{ order.order_code }}</div>
+  <div class="status-pill">{{ order.status }}</div>
+  <div class="table-wrap"><table>
+    <tr><th>Item</th><th>Qty</th><th>Price</th></tr>
+    {% for x in items %}<tr><td>{{ x.name }}</td><td>{{ x.quantity }}</td><td>₹{{ '%.2f'|format(x.price * x.quantity) }}</td></tr>{% endfor %}
+  </table></div>
+  <h3>Total: ₹{{ '%.2f'|format(order.total) }}</h3>
+  <a class="btn" href="{{ url_for('my_orders') }}">Track My Orders</a>
+</div>
+{% endblock %}

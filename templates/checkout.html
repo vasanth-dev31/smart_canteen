@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="checkout">
+  <div>
+    <p class="eyebrow">CHECKOUT</p><h1>Confirm & Pay</h1>
+    <p class="muted">This project uses a simulated payment step. No real money is charged.</p>
+  </div>
+  <form method="post" class="panel">
+    <h3>Payment method</h3>
+    <label><input type="radio" name="payment_method" value="Demo UPI" checked> Demo UPI</label>
+    <label><input type="radio" name="payment_method" value="Demo Card"> Demo Card</label>
+    <hr>
+    <div class="total-line"><span>Total</span><strong>₹{{ '%.2f'|format(total) }}</strong></div>
+    <button class="btn full" type="submit">Pay ₹{{ '%.2f'|format(total) }}</button>
+  </form>
+</div>
+{% endblock %}

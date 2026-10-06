@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="eyebrow">CANTEEN OPERATIONS</p>
+<h1>Admin Dashboard</h1>
+
+<section class="admin-grid">
+  <div class="panel">
+    <h2>Add Food Item</h2>
+    <form method="post" action="{{ url_for('add_menu') }}">
+      <label>Name<input name="name" required></label>
+      <label>Description<input name="description"></label>
+      <label>Price (₹)<input type="number" step="0.01" min="0" name="price" required></label>
+      <button class="btn" type="submit">Add Item</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Menu</h2>
+    {% for item in menu_items %}
+    <div class="admin-row">
+      <span>{{ item.name }} — ₹{{ '%.2f'|format(item.price) }}</span>
+      <form method="post" action="{{ url_for('toggle_menu', item_id=item.id) }}">
+        <button class="link-btn">{{ 'Disable' if item.available else 'Enable' }}</button>
+      </form>
+    </div>
+    {% else %}
+    <p class="muted">No menu items available.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel" style="margin-top:24px;">
+  <div class="page-head">
+    <div>
+      <h2>Incoming Orders</h2>
+      <p class="muted">See exactly what each student ordered, prepare the food, and verify the pickup code before handing it over.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Student</th>
+          <th>What They Ordered</th>
+          <th>Total</th>
+          <th>Payment</th>
+          <th>Pickup Code</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for o in orders %}
+        {% set order_items = items_by_order.get(o.id, []) %}
+        <tr>
+          <td><strong>#{{ o.id }}</strong></td>
+          <td>{{ o.student_name }}</td>
+
+          <td style="min-width:220px;">
+            {% if order_items %}
+              <details>
+                <summary>
+                  <strong>{{ order_items|length }} item{% if order_items|length != 1 %}s{% endif %}</strong>
+                  — View details
+                </summary>
+                <div class="order-items" style="margin-top:10px;">
+                  {% for item in order_items %}
+                  <div class="order-item-line" style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;">
+                    <span><strong>{{ item.name }}</strong> × {{ item.quantity }}</span>
+                    <span>₹{{ '%.2f'|format(item.price * item.quantity) }}</span>
+                  </div>
+                  {% endfor %}
+                </div>
+              </details>
+            {% else %}
+              <span class="muted">No item details found.</span>
+            {% endif %}
+          </td>
+
+          <td><strong>₹{{ '%.2f'|format(o.total) }}</strong></td>
+          <td>{{ o.payment_status }}</td>
+          <td><strong>{{ o.order_code }}</strong></td>
+          <td><span class="status-pill">{{ o.status }}</span></td>
+
+          <td style="min-width:220px;">
+            {% if o.status != 'Collected' %}
+              <form method="post" action="{{ url_for('update_order_status', order_id=o.id) }}" class="inline">
+                <select name="status" aria-label="Update order status">
+                  {% for s in ['Pending', 'Preparing', 'Ready'] %}
+                    <option value="{{ s }}" {% if o.status == s %}selected{% endif %}>{{ s }}</option>
+                  {% endfor %}
+                </select>
+                <button class="small-btn" type="submit">Update</button>
+              </form>
+            {% endif %}
+
+            {% if o.status == 'Ready' %}
+              <div class="pickup-box" style="margin-top:10px;">
+                <strong>Food is ready</strong>
+                <small>Ask the student for the pickup code before handing over the food.</small>
+                <form method="post" action="{{ url_for('collect_order', order_id=o.id) }}" class="inline" style="margin-top:8px;">
+                  <input class="code-input" name="order_code" placeholder="Enter code" required autocomplete="off">
+                  <button class="small-btn" type="submit">Verify & Collect</button>
+                </form>
+              </div>
+            {% elif o.status == 'Collected' %}
+              <span class="muted">Food handed over ✓</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="8">No incoming orders yet.</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel process-panel" style="margin-top:24px;">
+  <h2>Food Handover Process</h2>
+  <p class="muted">Use this process for every order.</p>
+  <div class="process-steps">
+    <div><strong>1. Pending</strong><span>New student order received</span></div>
+    <div><strong>2. Preparing</strong><span>Prepare the listed food items</span></div>
+    <div><strong>3. Ready</strong><span>Food is packed and ready</span></div>
+    <div><strong>4. Verify Code</strong><span>Student gives the pickup code</span></div>
+    <div><strong>5. Collected</strong><span>Hand over food and complete order</span></div>
+  </div>
+</section>
+{% endblock %}

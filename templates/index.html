@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">QR-BASED COLLEGE CANTEEN</p>
+    <h1>Order food without standing in a long queue.</h1>
+    <p>Scan the canteen QR code, choose your food, place the order, pay in the demo checkout, and collect it using your order code.</p>
+    {% if session.get('user_id') %}
+      <a class="btn" href="{{ url_for('menu') if session.get('role') != 'admin' else url_for('admin_dashboard') }}">Continue</a>
+    {% else %}
+      <a class="btn" href="{{ url_for('login') }}">Start Ordering</a>
+    {% endif %}
+  </div>
+  <div class="flow-card">
+    <div>📱 QR Scan</div><span>↓</span>
+    <div>🍽️ Menu</div><span>↓</span>
+    <div>🛒 Order + Payment</div><span>↓</span>
+    <div>🔑 Order Code</div><span>↓</span>
+    <div>📦 Collect</div>
+  </div>
+</section>
+<section class="cards">
+  <article><h3>Fast ordering</h3><p>Browse the digital menu and build a cart before submitting.</p></article>
+  <article><h3>Live status</h3><p>Students can see whether their order is Pending, Preparing, Ready or Collected.</p></article>
+  <article><h3>Simple admin</h3><p>Canteen staff can manage menu items and incoming orders.</p></article>
+</section>
+{% endblock %}
