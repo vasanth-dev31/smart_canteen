@@ -341,6 +341,6 @@ def qr_info():
     # This page is the destination represented by the canteen QR code.
     return redirect(url_for("index"))
 
+init_db()
 if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+     app.run(debug=True)
